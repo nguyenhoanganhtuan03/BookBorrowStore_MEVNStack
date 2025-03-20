@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "backend": "file:",
+    "mongodb": "^6.15.0",
     "nodemon": "^3.1.9"
   },
   "devDependencies": {
