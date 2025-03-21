@@ -1,23 +1,27 @@
 const dotenv = require("dotenv");
 const MongoDB = require("./app/utils/mongodb.util");
+const app = require("./app");
 
 dotenv.config();
 
+console.log('MONGODB_URI:', process.env.MONGODB_URI);
+console.log('PORT:', process.env.PORT);
+
 async function startServer() {
     try {
-        const db = await MongoDB.connect(process.env.MONGODB_URI, "BookBorrowStore");
+        const client = await MongoDB.connect(process.env.MONGODB_URI);
+        const db = client.db(); // Lấy database từ client
 
-        // Kiểm tra database đã tạo chưa bằng cách tạo collection tạm thời
-        const collections = await db.listCollections().toArray();
-        if (!collections.some((col) => col.name === "users")) {
-            await db.createCollection("users");
-            console.log("✅ Created 'users' collection");
-        }
+        console.log("✅ Connected to MongoDB");
 
-        // Tiếp tục khởi động server...
+        // Chạy server
+        const app = require("./app");
+        const PORT = process.env.PORT || 3000;
+        app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
     } catch (error) {
         console.error("❌ Server startup failed:", error);
     }
 }
 
 startServer();
+

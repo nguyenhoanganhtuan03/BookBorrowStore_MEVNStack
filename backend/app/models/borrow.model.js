@@ -1,8 +1,11 @@
 class Borrow {
-    constructor(userId, bookTitle, borrowDate) {
+    constructor(userId, bookId, borrowDate, returnDate, note=null) {
         this.userId = userId;
-        this.bookTitle = bookTitle;
+        this.bookId = bookId;
         this.borrowDate = borrowDate;
+        this.returnDate = returnDate;
+        this.note = note;
     }
 }
+
 module.exports = Borrow;
