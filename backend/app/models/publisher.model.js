@@ -5,4 +5,4 @@ class Publisher {
     }
 }
 
-module.exports = Book;
+module.exports = Publisher;
