@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const userRoutes = require('./app/routes/user.route');
 const borrowRoutes = require('./app/routes/borrow.route');
 const bookRoutes = require("./app/routes/book.route");
+const publisherRoutes = require("./app/routes/publisher.route")
 
 dotenv.config();
 
@@ -12,6 +13,7 @@ app.use(express.json());
 app.use('/api/users', userRoutes);
 app.use('/api/borrow', borrowRoutes);
 app.use("/api/books", bookRoutes);
+app.use("/api/publisher", publisherRoutes);
 
 app.get("/", (req, res) => {
     res.json({ message: "Welcome to Book Borrow Store."});

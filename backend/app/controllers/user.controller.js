@@ -1,7 +1,6 @@
 const MongoDB = require('../utils/mongodb.util');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const ObjectId = require('mongodb').ObjectId;
 
 
 // Đăng ký

@@ -1,5 +1,4 @@
 const MongoDB = require("../utils/mongodb.util");
-const { ObjectId } = require("mongodb");
 
 // Thêm sách mới
 exports.addBook = async (req, res) => {
