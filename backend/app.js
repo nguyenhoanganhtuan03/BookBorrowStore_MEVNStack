@@ -13,7 +13,7 @@ const app = express();
 app.use(express.json());
 
 app.use('/api/users', userRoutes);
-app.use('/api/borrow', borrowRoutes);
+app.use('/api/borrows', borrowRoutes);
 app.use("/api/books", bookRoutes);
 app.use("/api/publishers", publisherRoutes);
 app.use("/api/admin", adminRoutes);
