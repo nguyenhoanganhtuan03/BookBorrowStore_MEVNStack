@@ -1,5 +1,27 @@
 const MongoDB = require("../utils/mongodb.util");
 
+// Nhân viên đăng nhập
+exports.login = async (req, res) => {
+    try {
+        const { username, password } = req.body;
+
+        const db = MongoDB.getDatabase();
+        if (!db) {
+            return res.status(500).json({ message: "Database connection error" });
+        }
+
+        const user = await db.collection("staffs").findOne({ username });
+        if (!user || user.password !== password) {  
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
+
+        res.json({ message: "Staff login successful", user });
+    } catch (error) {
+        console.error("Login error:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+
 // 📌 Tìm nhân viên theo ID
 exports.getStaffById = async (req, res) => {
     try {
@@ -22,13 +44,16 @@ exports.getStaffById = async (req, res) => {
     }
 };
 
-// 📌 Tìm nhân viên theo tên
+// 📌 Tìm nhân viên theo username
 exports.getStaffByName = async (req, res) => {
     try {
-        const { fullname } = req.query;
-        const db = MongoDB.getDatabase();
+        const { username } = req.params;
+        if (!username || typeof username !== "string") {
+            return res.status(400).json({ message: "Invalid or missing username" });
+        }
 
-        const staffs = await db.collection("staffs").find({ fullname: { $regex: fullname, $options: "i" } }).toArray();
+        const db = MongoDB.getDatabase();
+        const staffs = await db.collection("staffs").find({ username: { $regex: username, $options: "i" } }).toArray();
 
         if (!staffs.length) {
             return res.status(404).json({ message: "No staff found" });
@@ -36,7 +61,8 @@ exports.getStaffByName = async (req, res) => {
 
         res.json(staffs);
     } catch (error) {
-        res.status(500).json({ message: "Failed to fetch staff", error });
+        console.log(error);
+        res.status(500).json({ message: "Failed to fetch staff", error: error.message });
     }
 };
 

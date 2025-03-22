@@ -25,11 +25,10 @@ exports.register = async (req, res) => {
             userCount++;
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
         const result = await db.collection("users").insertOne({ 
             _id: userId,
             username, 
-            password: hashedPassword, 
+            password,
             fullname, 
             phone, 
             email, 
@@ -45,24 +44,22 @@ exports.register = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 };
+
 // Đăng nhập
 exports.login = async (req, res) => {
     try {
         const { username, password } = req.body;
 
-        // Kết nối với MongoDB
         const db = MongoDB.getDatabase();
         if (!db) {
             return res.status(500).json({ message: "Database connection error" });
         }
 
-        // Tìm user theo username
         const user = await db.collection("users").findOne({ username });
-        if (!user || !(await bcrypt.compare(password, user.password))) {
+        if (!user || user.password !== password) {  // So sánh trực tiếp password
             return res.status(401).json({ message: "Invalid credentials" });
         }
 
-        // Đăng nhập thành công, không cần tạo token
         res.json({ message: "Login successful", user });
     } catch (error) {
         console.error("Login error:", error);
@@ -98,10 +95,6 @@ exports.updateUser = async (req, res) => {
         let updateData = req.body;
         const db = MongoDB.getDatabase();
 
-        if (updateData.password) {
-            updateData.password = await bcrypt.hash(updateData.password, 10);
-        }
-
         // Xóa _id nếu có trong updateData để tránh lỗi immutable field
         delete updateData._id;
 
@@ -120,7 +113,6 @@ exports.updateUser = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 };
-
 
 // Xóa người dùng theo ID
 exports.deleteUser = async (req, res) => {

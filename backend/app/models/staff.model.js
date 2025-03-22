@@ -1,5 +1,5 @@
 class Staff {
-    constructor(username, password, fullname = null, phone = null, address = null, position = null) {
+    constructor(username, password, fullname = null, phone = null, address = null, position) {
         this.username = username;
         this.password = password;
         this.fullname = fullname;
