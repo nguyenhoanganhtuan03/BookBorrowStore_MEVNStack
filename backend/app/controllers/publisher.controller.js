@@ -1,4 +1,5 @@
 const MongoDB = require("../utils/mongodb.util");
+const Publisher = require("../models/publisher.model");
 
 // Thêm NXB
 exports.addPublisher = async (req, res) => {
@@ -11,15 +12,21 @@ exports.addPublisher = async (req, res) => {
         const db = MongoDB.getDatabase();
 
         // Tạo ID mới
-        const lastPublisher = await db.collection("publishers").find().sort({ _id: -1 }).limit(1).toArray();
-        let newId = "pub_001";
-        if (lastPublisher.length > 0) {
-            const lastIdNumber = parseInt(lastPublisher[0]._id.split("_")[1], 10);
-            newId = `pub_${String(lastIdNumber + 1).padStart(3, "0")}`;
-        }
+        const lastPublisher = await db.collection("publishers")
+            .find({})
+            .sort({ _id: -1 })
+            .limit(1)
+            .toArray();
 
-        const newPublisher = { _id: newId, publisherName, address };
-        await db.collection("publishers").insertOne(newPublisher);
+        let nextId = 0;
+        if (lastPublisher.length > 0) {
+            nextId = parseInt(lastPublisher[0]._id.split("_")[1]) + 1;
+        }
+        const PublisherId = `pub_${nextId}`;
+
+        const newPublisher = new Publisher(publisherName, address);
+        await db.collection("publishers").insertOne({_id: PublisherId, ...newPublisher});
+
         res.status(201).json({ message: "Publisher added successfully", publisher: newPublisher });
     } catch (error) {
         res.status(500).json({ message: "Failed to add publisher", error });

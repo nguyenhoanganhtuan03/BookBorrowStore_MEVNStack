@@ -1,4 +1,5 @@
 const MongoDB = require("../utils/mongodb.util");
+const Book = require("../models/book.model");
 
 // Thêm sách mới
 exports.addBook = async (req, res) => {
@@ -23,19 +24,9 @@ exports.addBook = async (req, res) => {
         }
         const bookId = `book_${nextId}`;
 
-        const newBook = { 
-            _id: bookId,
-            bookname, 
-            author, 
-            price: Number(price), 
-            quantity: Number(quantity),
-            year: year || null,
-            publisherId: publisherId || null,
-            category: category || null,
-            image: image || null
-        };
+        const newBook = new Book(bookname, author, price, quantity, year, publisherId, category, image)
 
-        await db.collection("books").insertOne(newBook);
+        await db.collection("books").insertOne({_id: bookId, ...newBook});
         res.status(201).json({ message: "Book added successfully", bookId });
     } catch (error) {
         console.error("🚨 Error adding book:", error);

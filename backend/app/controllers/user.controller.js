@@ -1,6 +1,5 @@
 const MongoDB = require('../utils/mongodb.util');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const User = require("../models/user.model");
 
 
 // Đăng ký
@@ -15,29 +14,23 @@ exports.register = async (req, res) => {
         }
 
         const db = MongoDB.getDatabase();
-        let userCount = await db.collection("users").countDocuments();
         let userId;
         
-        while (true) {
-            userId = `user_${userCount}`;
-            const existingUser = await db.collection("users").findOne({ _id: userId });
-            if (!existingUser) break;
-            userCount++;
+        const lastUser = await db.collection("users")
+            .find({})
+            .sort({ _id: -1 })
+            .limit(1)
+            .toArray();
+
+        let nextId = 0;
+        if (lastUser.length > 0) {
+            nextId = parseInt(lastUser[0]._id.split("_")[1]) + 1;
         }
+        const UserId = `user_${nextId}`;
 
-        const result = await db.collection("users").insertOne({ 
-            _id: userId,
-            username, 
-            password,
-            fullname, 
-            phone, 
-            email, 
-            address, 
-            gender, 
-            dob
-        });
+        const newUser = new User(username, password, fullname, phone, email, address, gender, dob);
+        await db.collection("users").insertOne({_id: UserId, ...newUser});
 
-        console.log("✅ Kết quả insert:", result);
         res.status(201).json({ message: "User registered successfully" });
     } catch (error) {
         console.error("🚨 Lỗi khi đăng ký:", error);

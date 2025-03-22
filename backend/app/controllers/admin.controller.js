@@ -1,4 +1,5 @@
 const MongoDB = require("../utils/mongodb.util");
+const Staff = require("../models/staff.model");
 
 const adminRole = process.env.ADMIN_ROLE
 const userRole = process.env.USER_ROLE
@@ -7,7 +8,7 @@ const userRole = process.env.USER_ROLE
 exports.addStaff = async (req, res) => {
     try {
         const { username, password, fullname, position, phone, address } = req.body;
-        if (!username || !password) {
+        if (!username || !password || !position) {
             return res.status(400).json({ message: "Missing required fields" });
         }
         
@@ -20,16 +21,8 @@ exports.addStaff = async (req, res) => {
         }
         const StaffId = `staff_${nextId}`;
         
-        const newStaff = { _id: StaffId, 
-                        username, 
-                        password, 
-                        fullname: fullname || null, 
-                        position: position,
-                        phone: phone || null, 
-                        address: address || null    
-                    };
-        
-        await db.collection("staffs").insertOne(newStaff);
+        const newStaff = new Staff(username, password, fullname, phone, address, position)
+        await db.collection("staffs").insertOne({_id: StaffId, ...newStaff});
         res.status(201).json({ message: "Staff added successfully", staff: newStaff });
     } catch (error) {
         res.status(500).json({ message: "Failed to add staff", error: error.message });
@@ -75,7 +68,7 @@ exports.adminLogin = async (req, res) => {
             return res.status(401).json({ message: "Invalid credentials" });
         }
 
-        if (user.position !== process.env.ADMIN_ROLE) {
+        if (user.position !== adminRole) {
             return res.status(403).json({ message: "Access denied. Admin only." });
         }
 
