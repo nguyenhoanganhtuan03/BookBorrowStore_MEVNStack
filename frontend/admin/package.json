@@ -1,5 +1,5 @@
 {
-  "name": "admin",
+  "name": "b2106865-nguyenhoanganhtuan-frontend-3-4",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -9,11 +9,20 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.5.13"
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "axios": "^1.8.1",
+    "b2106865-nguyenhoanganhtuan-frontend-3-4": "file:",
+    "bootstrap": "^4.6.2",
+    "jquery": "^3.7.1",
+    "popper.js": "^1.16.1",
+    "vee-validate": "^4.15.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0",
+    "yup": "^1.6.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",
-    "vite": "^6.2.1",
+    "vite": "^6.1.0",
     "vite-plugin-vue-devtools": "^7.7.2"
   }
 }
