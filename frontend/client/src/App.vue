@@ -5,8 +5,12 @@ export default {
   components: {
     AppHeader,
   },
+  created() {
+    this.$router.push('/');
+  },
 };
 </script>
+
 
 <template class="container">
   <div id="app">

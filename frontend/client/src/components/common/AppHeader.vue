@@ -17,8 +17,11 @@
             </router-link>
 
             <!-- Nút Lịch sử mượn sách -->
-            <router-link to="/history" class="custom-btn">
-                <i class="fas fa-book-open"></i> Lịch sử mượn sách
+            <router-link 
+            v-if="authStore.user" 
+            :to="{ name: 'BorrowListPage', params: { userId: authStore.user._id } }" 
+            class="custom-btn">
+            <i class="fas fa-book-open"></i> Lịch sử mượn sách
             </router-link>
         </div>
 
@@ -45,7 +48,7 @@
                             👤 Xin chào, <strong>{{ username }}</strong>
                         </li>
                         <li>
-                            <router-link to="/userdetail/:userId" class="dropdown-item">
+                            <router-link :to="{ name: 'UserDetail', params: { userId: authStore.user._id } }" class="dropdown-item">
                                 <i class="fas fa-user"></i> Thông tin cá nhân
                             </router-link>
                         </li>

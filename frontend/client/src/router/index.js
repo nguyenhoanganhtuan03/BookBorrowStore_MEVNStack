@@ -6,6 +6,8 @@ import SearchPage from "@/views/SearchPage.vue";
 import LibraryPage from "@/views/LibraryPage.vue";
 import BookPage from "@/views/BookPage.vue";
 import UserDetailPage from "@/views/UserDetailPage.vue";
+import BorrowPage from "@/views/BorrowPage.vue";
+import BorrowListPage from "@/views/BorrowListPage.vue";
 
 const routes = [
   {
@@ -46,9 +48,30 @@ const routes = [
   },
 
   {
-    path: '/userdetail/:userId', 
+    path: '/userdetail/:userId',
     name: 'UserDetail',
     component: UserDetailPage,
+    props: true  
+  },
+  
+  {
+    path: '/userdetail',
+    name: 'UserDetailRedirect',
+    component: UserDetailPage,
+    props: true
+  },
+
+  {
+    path: '/borrow/:bookId',
+    name: 'BorrowPage',
+    component: BorrowPage,
+    props: true  
+  },
+
+  {
+    path: '/borrow/:userId',
+    name: 'BorrowListPage',
+    component: BorrowListPage,
     props: true  
   },
 

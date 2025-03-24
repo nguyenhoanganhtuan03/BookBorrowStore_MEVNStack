@@ -1,4 +1,5 @@
 <template>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <div class="container mt-5" v-if="user">
     <div class="card shadow-lg">
       <div class="card-header text-center bg-primary text-white">
@@ -8,37 +9,37 @@
         <form @submit.prevent="updateUser">
           <!-- Tên người dùng -->
           <div class="mb-3">
-            <label for="username" class="form-label">Tên người dùng</label>
+            <label class="form-label">Tên người dùng</label>
             <input type="text" id="username" class="form-control" v-model="user.username" disabled />
           </div>
           
           <!-- Họ và tên -->
           <div class="mb-3">
-            <label for="fullname" class="form-label">Họ tên</label>
+            <label class="form-label">Họ tên</label>
             <input type="text" id="fullname" class="form-control" v-model="user.fullname" />
           </div>
 
           <!-- Số điện thoại -->
           <div class="mb-3">
-            <label for="phone" class="form-label">Số điện thoại</label>
+            <label class="form-label">Số điện thoại</label>
             <input type="text" id="phone" class="form-control" v-model="user.phone" />
           </div>
 
           <!-- Email -->
           <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
+            <label class="form-label">Email</label>
             <input type="email" id="email" class="form-control" v-model="user.email" />
           </div>
 
           <!-- Địa chỉ -->
           <div class="mb-3">
-            <label for="address" class="form-label">Địa chỉ</label>
+            <label class="form-label">Địa chỉ</label>
             <input type="text" id="address" class="form-control" v-model="user.address" />
           </div>
 
           <!-- Giới tính -->
           <div class="mb-3">
-            <label for="gender" class="form-label">Giới tính</label>
+            <label class="form-label">Giới tính</label>
             <select id="gender" class="form-select" v-model="user.gender">
               <option value="male">Nam</option>
               <option value="female">Nữ</option>
@@ -48,8 +49,29 @@
 
           <!-- Ngày sinh -->
           <div class="mb-3">
-            <label for="dob" class="form-label">Ngày sinh</label>
+            <label class="form-label">Ngày sinh</label>
             <input type="date" id="dob" class="form-control" v-model="user.dob" />
+          </div>
+
+          <!-- Mật khẩu -->
+          <div class="mb-3">
+            <label class="form-label">Mật khẩu</label>
+            <div class="input-group">
+              <input 
+                :type="isPasswordVisible ? 'text' : 'password'" 
+                id="password" 
+                class="form-control" 
+                v-model="user.password" 
+                placeholder="Nhập mật khẩu"
+              />
+              <button 
+                type="button" 
+                class="btn btn-outline-secondary" 
+                @click="togglePasswordVisibility"
+              >
+                <i :class="isPasswordVisible ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+              </button>
+            </div>
           </div>
 
           <div class="d-flex justify-content-center">
@@ -65,46 +87,71 @@
   </div>
 </template>
 
+
 <script>
 import UserService from "@/services/user.service";  // Import UserService for API calls
 
 export default {
-  props: {
-    user: Object, // Nhận đối tượng user từ parent component
+  props: ['userId'],
+  data() {
+    return {
+      user: null,  // Biến để chứa thông tin người dùng
+      isPasswordVisible: false,  // Biến để điều khiển trạng thái hiển thị mật khẩu
+    };
   },
-  created() {
-    // Trước khi cập nhật, hiển thị thông tin người dùng
-    if (this.user && this.user.username) {
-      this.getUserInfo();
+  async created() {
+    try {
+      const userId = this.$route.params.userId;  // Lấy userId từ tham số URL
+
+      if (!userId) {
+        window.location.reload();
+      }
+
+      const response = await UserService.getUserById(userId);  // Gọi API lấy thông tin người dùng
+
+      if (response.status === "success") {
+        this.user = response.data.data;  // Lưu thông tin người dùng vào biến `user`
+        console.log("Dữ liệu người dùng", this.user.data);  // In ra dữ liệu để kiểm tra
+      } else {
+        alert("Không thể tải thông tin người dùng: " + response.message);
+      }
+    } catch (error) {
+      console.error("Lỗi khi lấy thông tin người dùng:", error);
+      alert("Đã có lỗi xảy ra khi tải thông tin người dùng");
     }
   },
+
   methods: {
-    // Lấy thông tin người dùng để hiển thị lên form
-    async getUserInfo() {
-      try {
-        const response = await UserService.getUserById(this.user.userId);
-        if (response.status === "success") {
-          // Nếu thông tin người dùng được lấy thành công, cập nhật lại
-          this.user = response.data;
-        } else {
-          console.error(response.message);
-        }
-      } catch (error) {
-        console.error("Lỗi khi lấy thông tin người dùng:", error);
-      }
+    // Hàm để chuyển đổi trạng thái hiển thị mật khẩu
+    togglePasswordVisibility() {
+      this.isPasswordVisible = !this.isPasswordVisible;
     },
 
-    // Hàm cập nhật thông tin người dùng
+    // Cập nhật thông tin người dùng
     async updateUser() {
       try {
-        const response = await UserService.updateUser(this.user.username, this.user);
+        const userId = this.$route.params.userId;
+
+        // Khởi tạo đối tượng JSON để chứa dữ liệu cập nhật
+        const updatedUserData = {
+          fullname: this.user.fullname,
+          phone: this.user.phone,
+          email: this.user.email,
+          address: this.user.address,
+          gender: this.user.gender,
+          dob: this.user.dob,
+          password: this.user.password,
+        };
+
+        const response = await UserService.updateUser(userId, updatedUserData);  // Gọi API cập nhật với dữ liệu thay đổi
         if (response.status === "success") {
           alert("Thông tin người dùng đã được cập nhật.");
         } else {
-          alert("Cập nhật thông tin người dùng thất bại.");
+          alert("Cập nhật thông tin người dùng thất bại: " + response.message);
         }
       } catch (error) {
         console.error("Lỗi khi cập nhật thông tin người dùng:", error);
+        alert("Đã có lỗi xảy ra khi cập nhật thông tin người dùng.");
       }
     },
 
@@ -113,19 +160,20 @@ export default {
       const confirmDelete = confirm("Bạn có chắc chắn muốn xóa tài khoản không?");
       if (confirmDelete) {
         try {
-          const response = await UserService.deleteUser(this.user.username);
+          const userId = this.$route.params.userId;
+          const response = await UserService.deleteUser(userId);  // Gọi API xóa tài khoản
           if (response.status === "success") {
             alert("Tài khoản đã được xóa.");
-            // Sau khi xóa thành công, có thể chuyển hướng đến trang đăng nhập hoặc trang chủ
-            this.$router.push("/login");
+            window.location.reload();  
           } else {
-            alert("Xóa tài khoản thất bại.");
+            alert("Xóa tài khoản thất bại: " + response.message);
           }
         } catch (error) {
           console.error("Lỗi khi xóa tài khoản:", error);
+          alert("Đã có lỗi xảy ra khi xóa tài khoản.");
         }
       }
-    },
+    }
   },
 };
 </script>

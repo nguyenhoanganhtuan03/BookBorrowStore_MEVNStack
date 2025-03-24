@@ -30,6 +30,8 @@
 </template>
 
 <script>
+import { useAuthStore } from "@/store/auth"; // Import store auth
+
 export default {
   props: {
     book: Object, // Nhận dữ liệu từ BookPage
@@ -40,8 +42,13 @@ export default {
     },
     // Hàm mượn sách
     borrowBook() {
-      // Logic để mượn sách
-      this.$router.push(`/borrow-book/${this.book.id}`); // Chuyển hướng đến trang mượn sách
+      const authStore = useAuthStore(); // Sử dụng store auth
+      if (authStore.isLoggedIn) {
+        const bookId = this.$route.params.bookId;
+        this.$router.push(`/borrow/${bookId}`); // Chuyển hướng đến trang mượn sách nếu đã đăng nhập
+      } else {
+        this.$router.push(`/login`); // Chuyển hướng đến trang login nếu chưa đăng nhập
+      }
     },
     // Hàm quay lại trang trước
     goBack() {

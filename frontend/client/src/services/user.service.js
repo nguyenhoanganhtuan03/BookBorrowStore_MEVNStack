@@ -75,7 +75,7 @@ class UserService {
 
     async updateUser(id, userData) {
         try {
-            const response = await this.api.put(`/${id}`, userData); // Gửi yêu cầu PUT tới API
+            const response = await this.api.put(`/update/${id}`, userData); // Gửi yêu cầu PUT tới API
             const data = response.data || {}; // Đảm bảo dữ liệu trả về luôn là một đối tượng
 
             // Trả về thông báo và dữ liệu người dùng đã được cập nhật
@@ -94,7 +94,6 @@ class UserService {
         }
     }
 
-
     async deleteUser(id) {
         try {
             const data = (await this.api.delete(`/${id}`)).data;
@@ -112,19 +111,23 @@ class UserService {
 
     async getUserById(id) {
         try {
-            const data = (await this.api.get(`/${id}`)).data;  
+            const response = await this.api.get(`/${id}`);
+            console.log("UserId from Backend:", response.data);  // Kiểm tra dữ liệu trả về
             return {
                 status: "success",
-                message: data.message || "User retrieved successfully",
-                data: data.data,
+                message: response.data.message || "User retrieved successfully",
+                data: response.data,
             };
         } catch (err) {
+            console.error(err);  // Debug thông báo lỗi
             return {
                 status: "error",
                 message: err.response?.data?.message || "Failed to fetch user",
             };
         }
     }
+
+
 }
 
 export default new UserService();

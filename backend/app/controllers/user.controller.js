@@ -156,12 +156,26 @@ exports.getUserById = async (req, res) => {
         const user = await db.collection("users").findOne({ _id: id });
 
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(404).json({
+                status: 'error',
+                message: 'User not found',
+                data: null
+            });
         }
 
-        res.json(user);
+        // Trả về dữ liệu người dùng với cấu trúc có status và message
+        res.json({
+            status: 'success',
+            message: 'User retrieved successfully',
+            data: user
+        });
     } catch (error) {
         console.error("Error fetching user by ID:", error);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({
+            status: 'error',
+            message: 'Internal server error',
+            data: null
+        });
     }
 };
+
