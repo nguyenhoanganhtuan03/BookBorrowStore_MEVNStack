@@ -81,17 +81,18 @@ class BorrowService {
     // Lấy borrows của người dùng theo userId
     async getBorrowsByUserId(userId) {
         try {
-            const response = await this.api.get(`/search/${userId}`); // Gửi GET request với userId
+            const response = await this.api.get(`/search/${userId}`); 
+            console.log("Dữ liệu Backend", response.data)
             return {
                 status: "success",
-                data: response.data?.data || [],
-                message: response.data?.message || "Fetched borrows by user ID successfully", // Thông báo thành công
+                data: response.data?.data || [], 
+                message: response.data?.message || "Fetched borrows by user ID successfully",
             };
         } catch (err) {
-            // Nếu có lỗi, trả về thông báo lỗi
+            const errorMessage = err.response?.data?.message || "Failed to fetch borrows by user ID";
             return {
                 status: "error",
-                message: err.response?.data?.message || "Failed to fetch borrows by user ID",
+                message: errorMessage,
             };
         }
     }

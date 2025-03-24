@@ -1,21 +1,20 @@
 <template>
   <div>
-    <!-- App Header -->
     <AppHeader />
-
-    <!-- Main content -->
-    <div class="container mt-4">
-      <h2>Danh sách các đơn mượn</h2>
-
-      <!-- Hiển thị danh sách các BorrowCard -->
-      <div class="row">
-        <div class="col-12 col-md-4" v-for="borrow in borrows" :key="borrow._id">
-          <BorrowCard :borrow="borrow" />
+    <div class="container mt-5 d-flex justify-content-center align-items-center">
+      <!-- Kiểm tra nếu borrows là một mảng và không có dữ liệu -->
+      <div v-if="Array.isArray(borrows) && borrows.length === 0" class="text-center">
+        <p>Không có đơn mượn nào.</p>
+      </div>
+      <div v-else>
+        <h2>Danh sách các đơn mượn</h2>
+        <div class="row">
+          <div class="col-12 col-md-4" v-for="borrow in borrows" :key="borrow._id">
+            <borrowCard :borrow="borrow" />
+          </div>
         </div>
       </div>
     </div>
-
-    <!-- App Footer -->
     <AppFooter />
   </div>
 </template>
@@ -48,7 +47,13 @@ export default {
     try {
       // Gọi API để lấy danh sách các đơn mượn của người dùng
       const response = await BorrowService.getBorrowsByUserId(this.userId);
-      this.borrows = response.data; // Lưu kết quả vào borrows
+      // Kiểm tra nếu phản hồi có dữ liệu trong borrows
+      if (response.status === "success") {
+        this.borrows = response; // Lưu kết quả vào borrows
+        console.log("Frontend nhận: ", this.borrows);
+      } else {
+        console.log("Không có dữ liệu đơn mượn.");
+      }
     } catch (error) {
       console.error("Lỗi khi lấy danh sách đơn mượn: ", error);
       alert("Không thể lấy danh sách đơn mượn.");
@@ -56,6 +61,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
 .container {
