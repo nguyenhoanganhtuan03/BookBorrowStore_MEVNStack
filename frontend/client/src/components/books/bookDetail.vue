@@ -10,16 +10,21 @@
       <!-- Phần hiển thị thông tin chi tiết sách -->
       <div class="book-info">
         <h2>{{ book.bookname || "No name available" }}</h2>
-        <p><strong>Author:</strong> {{ book.author || "Not available" }}</p>
-        <p><strong>Price:</strong> {{ formatPrice(book.price) }}</p>
-        <p><strong>Quantity:</strong> {{ book.quantity || "Not available" }}</p>
-        <p><strong>Published Year:</strong> {{ book.publishYear || "Not available" }}</p>
-        <p><strong>Publisher Code:</strong> {{ book.publisherCode || "Not available" }}</p>
-        <p><strong>Category:</strong> {{ book.category || "Not available" }}</p>
+        <p><strong>Tác giả:</strong> {{ book.author || "Not available" }}</p>
+        <p><strong>Giá:</strong> {{ formatPrice(book.price) }}</p>
+        <p><strong>Số lượng:</strong> {{ book.quantity || "Not available" }}</p>
+        <p><strong>Năm xuất bản:</strong> {{ book.publishYear || "Not available" }}</p>
+        <p><strong>Mã nhà xuất bản:</strong> {{ book.publisherCode || "Not available" }}</p>
+        <p><strong>Thể loại:</strong> {{ book.category || "Not available" }}</p>
       </div>
     </div>
+
+    <!-- Phần Actions với nút "Mượn sách" và nút "Quay lại" -->
     <div class="actions">
-      <button @click="editBook">Edit Book</button>
+      <button class="btn btn-primary btn-lg shadow-sm" @click="borrowBook">Mượn sách</button>
+      
+      <!-- Nút Quay lại ở góc dưới bên phải -->
+      <button class="btn btn-outline-primary btn-lg back-button shadow-sm" @click="goBack">Quay lại</button>
     </div>
   </div>
 </template>
@@ -33,9 +38,14 @@ export default {
     formatPrice(price) {
       return price ? new Intl.NumberFormat().format(price) + " VND" : "Chưa có giá";
     },
-    editBook() {
-      // Logic để chỉnh sửa sách
-      this.$router.push(`/edit-book/${this.book.id}`);
+    // Hàm mượn sách
+    borrowBook() {
+      // Logic để mượn sách
+      this.$router.push(`/borrow-book/${this.book.id}`); // Chuyển hướng đến trang mượn sách
+    },
+    // Hàm quay lại trang trước
+    goBack() {
+      this.$router.go(-1);  // Quay lại trang trước trong Vue Router
     }
   }
 };
@@ -79,19 +89,42 @@ export default {
 }
 
 .actions {
-  margin-top: 20px;
+  margin-top: 70px;
   text-align: center;
+  position: relative;
 }
 
+/* Nút Mượn sách */
 button {
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  cursor: pointer;
+  position: absolute;
+  right: 10px;
+  padding: 15px 30px;  /* Tăng kích thước nút */
+  font-size: 1.2rem;   /* Tăng kích thước chữ */
+  border-radius: 5px;
+  transition: all 0.3s ease;
+  width: 200px;  /* Cố định chiều rộng */
 }
 
 button:hover {
-  background-color: #0056b3;
+  transform: translateY(-2px); /* Thêm hiệu ứng nhấc nút khi hover */
+}
+
+/* Nút Quay lại */
+.back-button {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: transparent; /* Nền trong suốt */
+  color: #007bff; /* Màu chữ giống màu nút */
+  border: 2px solid #007bff; /* Đặt viền màu giống màu nút */
+  padding: 15px 30px;  /* Tăng kích thước nút */
+  font-size: 1.2rem;   /* Tăng kích thước chữ */
+  border-radius: 5px;
+  width: 200px;  /* Cố định chiều rộng */
+}
+
+.back-button:hover {
+  background-color: rgba(0, 123, 255, 0.1); /* Thêm hiệu ứng nền khi hover */
+  transform: translateY(-2px); /* Thêm hiệu ứng nhấc nút khi hover */
 }
 </style>

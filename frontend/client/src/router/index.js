@@ -5,6 +5,7 @@ import RegisterPage from '@/views/RegisterPage.vue';
 import SearchPage from "@/views/SearchPage.vue";
 import LibraryPage from "@/views/LibraryPage.vue";
 import BookPage from "@/views/BookPage.vue";
+import UserDetailPage from "@/views/UserDetailPage.vue";
 
 const routes = [
   {
@@ -42,6 +43,13 @@ const routes = [
     name: "BookPage",
     component: BookPage,
     props: true
+  },
+
+  {
+    path: '/userdetail/:userId', 
+    name: 'UserDetail',
+    component: UserDetailPage,
+    props: true  
   },
 
   {

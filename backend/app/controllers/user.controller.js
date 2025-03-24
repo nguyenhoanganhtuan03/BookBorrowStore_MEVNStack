@@ -145,3 +145,23 @@ exports.getAllUsers = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 };
+
+// Lấy thông tin người dùng theo ID
+exports.getUserById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const db = MongoDB.getDatabase();
+
+        // Tìm người dùng theo _id
+        const user = await db.collection("users").findOne({ _id: id });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.json(user);
+    } catch (error) {
+        console.error("Error fetching user by ID:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};

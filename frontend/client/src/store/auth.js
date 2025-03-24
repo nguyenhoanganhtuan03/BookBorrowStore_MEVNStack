@@ -7,7 +7,7 @@ export const useAuthStore = defineStore("auth", {
     }),
     actions: {
         login(userData) {
-            this.user = userData; // ✅ Lưu thông tin user
+            this.user = userData; // Lưu thông tin user vào state
             this.isAuthenticated = true;
             console.log("🔹 User logged in:", this.user);
         },

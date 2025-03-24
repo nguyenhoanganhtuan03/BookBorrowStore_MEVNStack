@@ -24,12 +24,12 @@ class UserService {
     async login(credentials) {
         try {
             const response = await this.api.post("/login", credentials);
-            console.log("✅ API Response:", response.data); 
+            console.log("✅ API Response:", response.data);
 
             return {
                 status: "success",
                 message: response.data.message || "Login successful",
-                data: response.data.data,
+                user: response.data.user,  // Trả về thông tin user từ response
             };
         } catch (err) {
             console.error("🔴 API Login Error:", err.response?.data || err.message);
@@ -75,19 +75,25 @@ class UserService {
 
     async updateUser(id, userData) {
         try {
-            const data = (await this.api.put(`/update/${id}`, userData)).data;
+            const response = await this.api.put(`/${id}`, userData); // Gửi yêu cầu PUT tới API
+            const data = response.data || {}; // Đảm bảo dữ liệu trả về luôn là một đối tượng
+
+            // Trả về thông báo và dữ liệu người dùng đã được cập nhật
             return {
                 status: "success",
-                message: data.message || "User updated successfully",
-                data: data.data,
+                message: data.message || "User updated successfully", // Kiểm tra thông báo từ API hoặc dùng thông báo mặc định
+                data: data.data || null, // Kiểm tra nếu có dữ liệu trả về
             };
         } catch (err) {
+            // Nếu có lỗi xảy ra trong quá trình gọi API
+            console.error("Error updating user:", err);
             return {
                 status: "error",
-                message: err.response?.data?.message || "Failed to update user",
+                message: err.response?.data?.message || "Failed to update user", // Kiểm tra thông báo lỗi từ API hoặc dùng thông báo mặc định
             };
         }
     }
+
 
     async deleteUser(id) {
         try {
@@ -100,6 +106,22 @@ class UserService {
             return {
                 status: "error",
                 message: err.response?.data?.message || "Failed to delete user",
+            };
+        }
+    }
+
+    async getUserById(id) {
+        try {
+            const data = (await this.api.get(`/${id}`)).data;  
+            return {
+                status: "success",
+                message: data.message || "User retrieved successfully",
+                data: data.data,
+            };
+        } catch (err) {
+            return {
+                status: "error",
+                message: err.response?.data?.message || "Failed to fetch user",
             };
         }
     }

@@ -43,16 +43,30 @@ class BookService {
 
     async getBookById(id) {
         try {
-            const data = (await this.api.get(`/${id}`)).data;
-            return {
-                status: "success",
-                message: data.message || "Book found successfully",
-                data: data.data,
-            };
+            console.log("🔎 Đang tìm kiếm sách với ID:", id);
+            const response = await this.api.get(`/${id}`);
+            console.log("📚 Kết quả API:", response.data);
+
+            // Kiểm tra nếu response.data hợp lệ
+            if (response.data && response.data._id) {
+                return {
+                    status: "success",
+                    message: response.data.message || "Book found successfully",
+                    data: response.data, // ✅ Trả về trực tiếp dữ liệu sách
+                };
+            } else {
+                return {
+                    status: "error",
+                    message: "Không tìm thấy sách với ID này",
+                    data: [],
+                };
+            }
         } catch (err) {
+            console.error("❌ Lỗi API:", err);
             return {
                 status: "error",
-                message: err.response?.data?.message || "Book not found",
+                message: err.response?.data?.message || "Lỗi khi gọi API",
+                data: [],
             };
         }
     }

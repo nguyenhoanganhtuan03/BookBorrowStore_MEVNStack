@@ -45,7 +45,7 @@
                             👤 Xin chào, <strong>{{ username }}</strong>
                         </li>
                         <li>
-                            <router-link to="/profile" class="dropdown-item">
+                            <router-link to="/userdetail/:userId" class="dropdown-item">
                                 <i class="fas fa-user"></i> Thông tin cá nhân
                             </router-link>
                         </li>

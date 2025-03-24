@@ -61,14 +61,14 @@ export default {
     setup() {
         const authStore = useAuthStore(); // ✅ Pinia store
         const router = useRouter(); // ✅ Khai báo router
-        const username = ref("");
-        const password = ref("");
-        const errorMessage = ref("");
-        const loading = ref(false);
+        const username = ref(""); // Dữ liệu username từ input
+        const password = ref(""); // Dữ liệu password từ input
+        const errorMessage = ref(""); // Lỗi đăng nhập nếu có
+        const loading = ref(false); // Biến trạng thái loading khi đang đăng nhập
 
         const handleLogin = async () => {
-            errorMessage.value = "";
-            loading.value = true;
+            errorMessage.value = ""; // Reset lỗi trước khi gửi yêu cầu
+            loading.value = true; // Bật trạng thái loading khi gửi yêu cầu đăng nhập
 
             console.log("🔹 Sending login request:", { username: username.value, password: password.value });
 
@@ -81,25 +81,25 @@ export default {
                 console.log("🔹 API Response:", response);
 
                 if (response.status === "success") {
-                    authStore.login(response.data); // ✅ Gọi authStore.login() đúng cách
+                    authStore.login(response.user); 
                     alert("🎉 Đăng nhập thành công!");
-                    router.push("/"); // ✅ Chuyển hướng sau khi đăng nhập
+                    router.push("/"); 
                 } else {
-                    errorMessage.value = response.message; // Hiển thị lỗi từ API
+                    errorMessage.value = response.message; 
                 }
             } catch (error) {
+                // Nếu có lỗi trong quá trình đăng nhập
                 console.error("🔴 Login error:", error);
-                errorMessage.value = "Lỗi đăng nhập, vui lòng thử lại!";
+                errorMessage.value = "Lỗi đăng nhập, vui lòng thử lại!"; // Hiển thị thông báo lỗi
             }
 
-            loading.value = false;
+            loading.value = false; // Tắt trạng thái loading sau khi hoàn tất
         };
 
         return { username, password, errorMessage, loading, handleLogin };
     },
 };
 </script>
-
 
 <style scoped>
 /* Giảm khoảng cách giữa Header và Footer */
