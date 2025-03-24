@@ -14,22 +14,30 @@ exports.register = async (req, res) => {
         }
 
         const db = MongoDB.getDatabase();
-        let userId;
-        
+
+        // Kiểm tra xem username đã tồn tại chưa
+        const existingUser = await db.collection("users").findOne({ username: username });
+        if (existingUser) {
+            console.log("🚨 Username đã tồn tại!");
+            return res.status(400).json({ message: "Username already exists" });
+        }
+
+        // Tạo UserId mới
+        let nextId = 0;
         const lastUser = await db.collection("users")
             .find({})
             .sort({ _id: -1 })
             .limit(1)
             .toArray();
-
-        let nextId = 0;
+        
         if (lastUser.length > 0) {
             nextId = parseInt(lastUser[0]._id.split("_")[1]) + 1;
         }
-        const UserId = `user_${nextId}`;
+        const userId = `user_${nextId}`;
 
+        // Tạo người dùng mới
         const newUser = new User(username, password, fullname, phone, email, address, gender, dob);
-        await db.collection("users").insertOne({_id: UserId, ...newUser});
+        await db.collection("users").insertOne({ _id: userId, ...newUser });
 
         res.status(201).json({ message: "User registered successfully" });
     } catch (error) {

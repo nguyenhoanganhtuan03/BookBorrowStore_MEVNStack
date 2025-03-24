@@ -1,15 +1,30 @@
 const MongoDB = require("../utils/mongodb.util");
 const Book = require("../models/book.model");
+const fs = require('fs');
+const path = require('path');
 
 // Thêm sách mới
 exports.addBook = async (req, res) => {
     try {
-        const { bookname, author, price, quantity, year, publisherId, category, image } = req.body;
+        const { bookname, author, price, quantity, year, publisherId, category, imagePath } = req.body;
         if (!bookname || !author || !price || !quantity) {
             return res.status(400).json({ message: "Missing required fields" });
         }
 
         const db = MongoDB.getDatabase();
+
+        // Kiểm tra nếu có imagePath (đường dẫn hình ảnh) trong request
+        let imageBase64 = null;
+        if (imagePath) {
+            // Đọc tệp hình ảnh và chuyển đổi nó thành base64
+            const imagePathAbsolute = path.resolve(imagePath); // Đảm bảo rằng đường dẫn là tuyệt đối
+            if (fs.existsSync(imagePathAbsolute)) {
+                const imageBuffer = fs.readFileSync(imagePathAbsolute);
+                imageBase64 = imageBuffer.toString('base64');
+            } else {
+                return res.status(400).json({ message: "Image file not found" });
+            }
+        }
 
         // Lấy ID sách lớn nhất hiện có
         const lastBook = await db.collection("books")
@@ -24,9 +39,12 @@ exports.addBook = async (req, res) => {
         }
         const bookId = `book_${nextId}`;
 
-        const newBook = new Book(bookname, author, price, quantity, year, publisherId, category, image)
+        // Tạo sách mới
+        const newBook = new Book(bookname, author, price, quantity, year, publisherId, category, imageBase64);
 
-        await db.collection("books").insertOne({_id: bookId, ...newBook});
+        // Lưu sách vào cơ sở dữ liệu
+        await db.collection("books").insertOne({ _id: bookId, ...newBook });
+
         res.status(201).json({ message: "Book added successfully", bookId });
     } catch (error) {
         console.error("🚨 Error adding book:", error);
@@ -105,6 +123,18 @@ exports.updateBook = async (req, res) => {
             return res.status(400).json({ message: "Invalid book ID format" });
         }
 
+        // Nếu có ảnh mới được truyền lên, chuyển nó thành base64
+        if (updateFields.imagePath) {
+            const imagePathAbsolute = path.resolve(updateFields.imagePath); // Đảm bảo rằng đường dẫn là tuyệt đối
+            if (fs.existsSync(imagePathAbsolute)) {
+                const imageBuffer = fs.readFileSync(imagePathAbsolute);
+                updateFields.image = imageBuffer.toString('base64'); // Cập nhật trường image với dữ liệu base64
+                delete updateFields.imagePath; // Xóa trường imagePath khỏi đối tượng updateFields
+            } else {
+                return res.status(400).json({ message: "Image file not found" });
+            }
+        }
+
         // Loại bỏ các giá trị undefined/null khỏi updateFields
         Object.keys(updateFields).forEach((key) => {
             if (updateFields[key] === undefined || updateFields[key] === null) {
@@ -127,10 +157,10 @@ exports.updateBook = async (req, res) => {
 
         res.json({ message: "Book updated successfully" });
     } catch (error) {
-        res.status(500).json({ message: "Failed to update book", error });
+        console.error("🚨 Error updating book:", error);
+        res.status(500).json({ message: "Failed to update book", error: error.message });
     }
 };
-
 
 // Xóa sách
 exports.deleteBook = async (req, res) => {

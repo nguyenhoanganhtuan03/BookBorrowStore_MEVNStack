@@ -105,3 +105,22 @@ exports.getAllBorrows = async (req, res) => {
         res.status(500).json({ message: "Failed to retrieve borrow records", error: error.message });
     }
 };
+
+// Lấy danh sách đơn mượn theo userId
+exports.getBorrowsByUserId = async (req, res) => {
+    try {
+        const userId  = req.params;
+        const db = MongoDB.getDatabase();
+
+        // Tìm kiếm các đơn mượn theo userId
+        const borrows = await db.collection("borrows").find(userId).toArray();
+
+        if (borrows.length === 0) {
+            return res.status(404).json({ message: "No borrow records found for this user" });
+        }
+
+        res.json({ message: "List of borrow records for user", borrows });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to retrieve borrow records", error: error.message });
+    }
+};

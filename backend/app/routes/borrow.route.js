@@ -6,5 +6,6 @@ router.post('/borrow', borrowController.createBorrow);
 router.get('/:id', borrowController.getBorrowById);
 router.put('/:id', borrowController.updateBorrow);
 router.get('/', borrowController.getAllBorrows);
+router.get('/search/:userId', borrowController.getBorrowsByUserId);
 
 module.exports = router;
