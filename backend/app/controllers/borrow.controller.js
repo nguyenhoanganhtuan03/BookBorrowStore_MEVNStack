@@ -39,6 +39,12 @@ exports.createBorrow = async (req, res) => {
         const newBorrow = new Borrow(userId, bookId, borrowDate, returnDate, note);
         await db.collection("borrows").insertOne({ _id: borrowId, ...newBorrow });
 
+        // Trừ quantity của sách đi 1
+        await db.collection("books").updateOne(
+            { _id: bookId },
+            { $set: { quantity: (parseInt(book.quantity) - 1) } }
+        );
+
         res.status(201).json({ message: "Borrow record created successfully", borrow: { _id: borrowId, ...newBorrow } });
     } catch (error) {
         console.log(error)
@@ -48,6 +54,7 @@ exports.createBorrow = async (req, res) => {
 
 
 // Cập nhật đơn mượn sách
+// Cập nhật đơn mượn sách
 exports.updateBorrow = async (req, res) => {
     try {
         const { id } = req.params;
@@ -56,6 +63,27 @@ exports.updateBorrow = async (req, res) => {
 
         if (!/^borrow_\d+$/.test(id)) {
             return res.status(400).json({ message: "Invalid borrow ID format" });
+        }
+
+        // Kiểm tra nếu note thay đổi thành "Đã trả"
+        if (updateFields.note && updateFields.note === "Đã trả") {
+            // Tìm đơn mượn hiện tại để lấy thông tin sách
+            const borrow = await db.collection("borrows").findOne({ _id: id });
+            if (!borrow) {
+                return res.status(404).json({ message: "Borrow record not found" });
+            }
+
+            // Lấy thông tin sách từ bookId
+            const book = await db.collection("books").findOne({ _id: borrow.bookId });
+            if (!book) {
+                return res.status(404).json({ message: "Book not found" });
+            }
+
+            // Cập nhật lại số lượng sách
+            await db.collection("books").updateOne(
+                { _id: borrow.bookId },
+                { $set: { quantity: (parseInt(book.quantity) + 1) } }
+            );
         }
 
         const updatedBorrow = await db.collection("borrows").updateOne(
@@ -72,6 +100,7 @@ exports.updateBorrow = async (req, res) => {
         res.status(500).json({ message: "Failed to update borrow record", error: error.message });
     }
 };
+
 
 // Tìm kiếm đơn mượn sách theo ID
 exports.getBorrowById = async (req, res) => {

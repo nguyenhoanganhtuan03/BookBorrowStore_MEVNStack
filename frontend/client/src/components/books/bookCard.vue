@@ -43,7 +43,7 @@ export default {
             return price ? `${price.toLocaleString()} VNĐ` : "Chưa có giá";
         },
         goToDetail() {
-            this.$router.push({ name: 'BookDetail', params: { id: this.book.id } });
+            this.$router.push({ name: 'BookPage', params: { bookId: this.book.id } });
         }
     }
 };

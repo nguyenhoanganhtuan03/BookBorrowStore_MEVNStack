@@ -4,6 +4,7 @@ import LoginPage from '@/views/LoginPage.vue';
 import RegisterPage from '@/views/RegisterPage.vue';
 import SearchPage from "@/views/SearchPage.vue";
 import LibraryPage from "@/views/LibraryPage.vue";
+import BookPage from "@/views/BookPage.vue";
 
 const routes = [
   {
@@ -34,6 +35,13 @@ const routes = [
     path: '/search', 
     name: "SearchPage",
     component: SearchPage,
+  },
+
+  {
+    path: '/library/:bookId', 
+    name: "BookPage",
+    component: BookPage,
+    props: true
   },
 
   {
