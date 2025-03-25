@@ -6,7 +6,7 @@
         <!-- Nội dung trang đăng nhập -->
         <div class="d-flex justify-content-center align-items-center min-vh-75 py-4">
             <div class="login-card p-5 shadow-lg rounded">
-                <h2 class="text-center text-primary mb-4">Đăng nhập</h2>
+                <h2 class="text-center text-primary mb-4">Nhân viên đăng nhập</h2>
 
                 <!-- Hiển thị thông báo -->
                 <div v-if="errorMessage" class="alert alert-danger text-center">
@@ -41,7 +41,7 @@
                 <!-- Dòng chuyển đến form đăng nhập nhân viên -->
                 <div class="text-center mt-3">
                     <button @click="goToEmployeeLogin" class="btn btn-link text-secondary">
-                        Đăng nhập cho nhân viên
+                        Đăng nhập cho người dùng
                     </button>
                 </div>
             </div>
@@ -55,7 +55,7 @@
 <script>
 import { ref } from "vue";
 import { useRouter } from "vue-router"; // ✅ Import router đúng cách
-import userService from "@/services/user.service"; // ✅ Kiểm tra export
+import staffService from "@/services/staff.service"; // ✅ Kiểm tra export
 import { useAuthStore } from "@/store/auth"; // ✅ Kiểm tra Pinia store
 import AppHeader from "@/components/common/AppHeader.vue";
 import AppFooter from "@/components/common/AppFooter.vue";
@@ -80,7 +80,7 @@ export default {
             console.log("🔹 Sending login request:", { username: username.value, password: password.value });
 
             try {
-                const response = await userService.login({ 
+                const response = await staffService.staffLogin({ 
                     username: username.value, 
                     password: password.value 
                 });
@@ -105,7 +105,7 @@ export default {
 
         // Chuyển hướng đến trang đăng nhập cho nhân viên
         const goToEmployeeLogin = () => {
-            router.push("/staff/login"); // Chuyển đến trang đăng nhập nhân viên
+            router.push("/login"); // Chuyển đến trang đăng nhập nhân viên
         };
 
         return { username, password, errorMessage, loading, handleLogin, goToEmployeeLogin };

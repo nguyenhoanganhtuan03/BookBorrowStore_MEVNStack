@@ -23,13 +23,17 @@ class UserService {
 
     async login(credentials) {
         try {
-            const data = (await this.api.post("/login", credentials)).data;
+            const response = await this.api.post("/login", credentials);
+            console.log("✅ API Response:", response.data);
+
             return {
                 status: "success",
-                message: data.message || "Login successful",
-                data: data.data,
+                message: response.data.message || "Login successful",
+                user: response.data.user,  // Trả về thông tin user từ response
             };
         } catch (err) {
+            console.error("🔴 API Login Error:", err.response?.data || err.message);
+
             return {
                 status: "error",
                 message: err.response?.data?.message || "Login failed",
@@ -71,16 +75,21 @@ class UserService {
 
     async updateUser(id, userData) {
         try {
-            const data = (await this.api.put(`/update/${id}`, userData)).data;
+            const response = await this.api.put(`/update/${id}`, userData); // Gửi yêu cầu PUT tới API
+            const data = response.data || {}; // Đảm bảo dữ liệu trả về luôn là một đối tượng
+
+            // Trả về thông báo và dữ liệu người dùng đã được cập nhật
             return {
                 status: "success",
-                message: data.message || "User updated successfully",
-                data: data.data,
+                message: data.message || "User updated successfully", // Kiểm tra thông báo từ API hoặc dùng thông báo mặc định
+                data: data.data || null, // Kiểm tra nếu có dữ liệu trả về
             };
         } catch (err) {
+            // Nếu có lỗi xảy ra trong quá trình gọi API
+            console.error("Error updating user:", err);
             return {
                 status: "error",
-                message: err.response?.data?.message || "Failed to update user",
+                message: err.response?.data?.message || "Failed to update user", // Kiểm tra thông báo lỗi từ API hoặc dùng thông báo mặc định
             };
         }
     }
@@ -99,6 +108,26 @@ class UserService {
             };
         }
     }
+
+    async getUserById(id) {
+        try {
+            const response = await this.api.get(`/${id}`);
+            console.log("UserId from Backend:", response.data);  // Kiểm tra dữ liệu trả về
+            return {
+                status: "success",
+                message: response.data.message || "User retrieved successfully",
+                data: response.data,
+            };
+        } catch (err) {
+            console.error(err);  // Debug thông báo lỗi
+            return {
+                status: "error",
+                message: err.response?.data?.message || "Failed to fetch user",
+            };
+        }
+    }
+
+
 }
 
 export default new UserService();
