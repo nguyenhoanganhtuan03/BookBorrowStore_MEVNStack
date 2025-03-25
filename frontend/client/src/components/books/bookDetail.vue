@@ -2,10 +2,8 @@
   <div class="book-detail">
     <div class="book-detail-container">
       <!-- Phần hiển thị ảnh sách -->
-      <div class="book-image">
-        <img :src="book.image" alt="Book Image" v-if="book.image" />
-        <p v-else>No image available</p>
-      </div>
+      <img v-if="book.image" :src="book.image" :alt="book.bookname ? `${book.bookname}` : 'Book Cover'"  class="book-image"/>
+      <i v-else class="fas fa-book book-icon" aria-hidden="true"></i>
 
       <!-- Phần hiển thị thông tin chi tiết sách -->
       <div class="book-info">

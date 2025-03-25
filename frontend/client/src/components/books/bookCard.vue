@@ -7,11 +7,8 @@
         :class="{ 'hover-effect': hover }"
     >
         <!-- Hình ảnh sách -->
-        <img 
-            :src="book.image ? `data:image/jpeg;base64,${book.image}` : defaultImage"
-            alt="Book Cover"
-            class="book-image"
-        />
+        <img v-if="book.image" :src="book.image" :alt="book.bookname ? `${book.bookname}` : 'Book Cover'"  class="book-image"/>
+        <i v-else class="fas fa-book book-icon" aria-hidden="true"></i>
         
         <!-- Thông tin sách -->
         <div class="book-info">
@@ -32,11 +29,6 @@ export default {
         return {
             hover: false
         };
-    },
-    computed: {
-        defaultImage() {
-            return "/book.jpg"; // Ảnh mặc định
-        }
     },
     methods: {
         formatPrice(price) {

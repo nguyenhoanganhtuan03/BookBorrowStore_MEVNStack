@@ -14,13 +14,13 @@ exports.addBook = async (req, res) => {
         const db = MongoDB.getDatabase();
 
         // Kiểm tra nếu có imagePath (đường dẫn hình ảnh) trong request
-        let imageBase64 = null;
+        let imagePathStored = null;
         if (imagePath) {
-            // Đọc tệp hình ảnh và chuyển đổi nó thành base64
+            // Đảm bảo rằng đường dẫn hình ảnh hợp lệ
             const imagePathAbsolute = path.resolve(imagePath); // Đảm bảo rằng đường dẫn là tuyệt đối
             if (fs.existsSync(imagePathAbsolute)) {
-                const imageBuffer = fs.readFileSync(imagePathAbsolute);
-                imageBase64 = imageBuffer.toString('base64');
+                // Nếu hình ảnh tồn tại, lưu đường dẫn hình ảnh vào imagePathStored
+                imagePathStored = `/uploads/${path.basename(imagePath)}`; // Lưu đường dẫn tương đối đến thư mục uploads
             } else {
                 return res.status(400).json({ message: "Image file not found" });
             }
@@ -40,7 +40,7 @@ exports.addBook = async (req, res) => {
         const bookId = `book_${nextId}`;
 
         // Tạo sách mới
-        const newBook = new Book(bookname, author, price, quantity, year, publisherId, category, imageBase64);
+        const newBook = new Book(bookname, author, price, quantity, year, publisherId, category, imagePathStored);
 
         // Lưu sách vào cơ sở dữ liệu
         await db.collection("books").insertOne({ _id: bookId, ...newBook });
@@ -123,12 +123,13 @@ exports.updateBook = async (req, res) => {
             return res.status(400).json({ message: "Invalid book ID format" });
         }
 
-        // Nếu có ảnh mới được truyền lên, chuyển nó thành base64
+        // Nếu có ảnh mới được truyền lên, chỉ lưu lại đường dẫn hình ảnh
         if (updateFields.imagePath) {
+            // Đảm bảo rằng đường dẫn hình ảnh hợp lệ
             const imagePathAbsolute = path.resolve(updateFields.imagePath); // Đảm bảo rằng đường dẫn là tuyệt đối
             if (fs.existsSync(imagePathAbsolute)) {
-                const imageBuffer = fs.readFileSync(imagePathAbsolute);
-                updateFields.image = imageBuffer.toString('base64'); // Cập nhật trường image với dữ liệu base64
+                // Lưu đường dẫn tương đối vào updateFields
+                updateFields.image = `/uploads/${path.basename(updateFields.imagePath)}`;
                 delete updateFields.imagePath; // Xóa trường imagePath khỏi đối tượng updateFields
             } else {
                 return res.status(400).json({ message: "Image file not found" });
