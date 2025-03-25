@@ -82,11 +82,11 @@ class BorrowService {
     async getBorrowsByUserId(userId) {
         try {
             const response = await this.api.get(`/search/${userId}`); 
-            console.log("Dữ liệu Backend", response.data)
+            console.log("Dữ liệu Backend", response)
             return {
                 status: "success",
-                data: response.data?.data || [], 
                 message: response.data?.message || "Fetched borrows by user ID successfully",
+                data: response|| []
             };
         } catch (err) {
             const errorMessage = err.response?.data?.message || "Failed to fetch borrows by user ID";

@@ -1,15 +1,15 @@
 <template>
   <div>
     <AppHeader />
-    <div class="container mt-5 d-flex justify-content-center align-items-center">
+    <div class="container mt-5">
       <!-- Kiểm tra nếu borrows là một mảng và không có dữ liệu -->
       <div v-if="Array.isArray(borrows) && borrows.length === 0" class="text-center">
         <p>Không có đơn mượn nào.</p>
       </div>
       <div v-else>
-        <h2>Danh sách các đơn mượn</h2>
-        <div class="row">
-          <div class="col-12 col-md-4" v-for="borrow in borrows" :key="borrow._id">
+        <h2 class="text-center">Danh sách các đơn mượn</h2>
+        <div class="list-group">
+          <div v-for="borrow in borrows" :key="borrow._id" class="list-group-item">
             <borrowCard :borrow="borrow" />
           </div>
         </div>
@@ -49,7 +49,7 @@ export default {
       const response = await BorrowService.getBorrowsByUserId(this.userId);
       // Kiểm tra nếu phản hồi có dữ liệu trong borrows
       if (response.status === "success") {
-        this.borrows = response; // Lưu kết quả vào borrows
+        this.borrows = response.data.data.borrows; // Lưu kết quả vào borrows
         console.log("Frontend nhận: ", this.borrows);
       } else {
         console.log("Không có dữ liệu đơn mượn.");
@@ -62,9 +62,12 @@ export default {
 };
 </script>
 
-
 <style scoped>
 .container {
   margin-top: 20px;
+}
+
+.list-group-item {
+  margin-bottom: 10px; /* Tạo khoảng cách giữa các phần tử trong list */
 }
 </style>
