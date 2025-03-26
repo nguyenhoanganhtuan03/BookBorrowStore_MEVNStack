@@ -1,6 +1,6 @@
 class Publisher {
-    constructor(publiserName, address) {
-        this.publiserName = publiserName;
+    constructor(publisherName, address) {
+        this.publisherName = publisherName ;
         this.address = address;
     }
 }

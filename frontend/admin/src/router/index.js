@@ -11,6 +11,10 @@ import BorrowListPage from "@/views/BorrowListPage.vue";
 import StaffLogin from "@/views/StaffLogin.vue";
 import AdminPage from "@/views/AdminPage.vue";
 import StaffManagePage from "@/views/StaffManagePage.vue";
+import UserManagePage from "@/views/UserManagePage.vue";
+import BookManagePage from "@/views/BookManagePage.vue";
+import BorrowManagePage from "@/views/BorrowManagePage.vue";
+import PublisherManagePage from "@/views/PublisherManagePage.vue";
 
 const routes = [
   {
@@ -94,6 +98,30 @@ const routes = [
     path: '/admin/staff-manage',
     name: 'StaffManagePage',
     component: StaffManagePage,  
+  },
+
+  {
+    path: '/admin/user-manage',
+    name: 'UserManagePage',
+    component: UserManagePage,  
+  },
+
+  {
+    path: '/admin/book-manage',
+    name: 'BookManagePage',
+    component: BookManagePage,  
+  },
+
+  {
+    path: '/admin/borrow-manage',
+    name: 'BorrowManagePage',
+    component: BorrowManagePage,  
+  },
+
+  {
+    path: '/admin/publisher-manage',
+    name: 'PublisherManagePage',
+    component: PublisherManagePage,  
   },
 
   {

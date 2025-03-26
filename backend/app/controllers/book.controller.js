@@ -6,25 +6,12 @@ const path = require('path');
 // Thêm sách mới
 exports.addBook = async (req, res) => {
     try {
-        const { bookname, author, price, quantity, year, publisherId, category, imagePath } = req.body;
+        const { bookname, author, price, quantity, year, publisherId, category, image } = req.body;
         if (!bookname || !author || !price || !quantity) {
             return res.status(400).json({ message: "Missing required fields" });
         }
 
         const db = MongoDB.getDatabase();
-
-        // Kiểm tra nếu có imagePath (đường dẫn hình ảnh) trong request
-        let imagePathStored = null;
-        if (imagePath) {
-            // Đảm bảo rằng đường dẫn hình ảnh hợp lệ
-            const imagePathAbsolute = path.resolve(imagePath); // Đảm bảo rằng đường dẫn là tuyệt đối
-            if (fs.existsSync(imagePathAbsolute)) {
-                // Nếu hình ảnh tồn tại, lưu đường dẫn hình ảnh vào imagePathStored
-                imagePathStored = `/uploads/${path.basename(imagePath)}`; // Lưu đường dẫn tương đối đến thư mục uploads
-            } else {
-                return res.status(400).json({ message: "Image file not found" });
-            }
-        }
 
         // Lấy ID sách lớn nhất hiện có
         const lastBook = await db.collection("books")
@@ -40,7 +27,7 @@ exports.addBook = async (req, res) => {
         const bookId = `book_${nextId}`;
 
         // Tạo sách mới
-        const newBook = new Book(bookname, author, price, quantity, year, publisherId, category, imagePathStored);
+        const newBook = new Book(bookname, author, price, quantity, year, publisherId, category, image);
 
         // Lưu sách vào cơ sở dữ liệu
         await db.collection("books").insertOne({ _id: bookId, ...newBook });
@@ -121,19 +108,6 @@ exports.updateBook = async (req, res) => {
         // Kiểm tra định dạng ID
         if (!/^book_\d+$/.test(id)) {
             return res.status(400).json({ message: "Invalid book ID format" });
-        }
-
-        // Nếu có ảnh mới được truyền lên, chỉ lưu lại đường dẫn hình ảnh
-        if (updateFields.imagePath) {
-            // Đảm bảo rằng đường dẫn hình ảnh hợp lệ
-            const imagePathAbsolute = path.resolve(updateFields.imagePath); // Đảm bảo rằng đường dẫn là tuyệt đối
-            if (fs.existsSync(imagePathAbsolute)) {
-                // Lưu đường dẫn tương đối vào updateFields
-                updateFields.image = `/uploads/${path.basename(updateFields.imagePath)}`;
-                delete updateFields.imagePath; // Xóa trường imagePath khỏi đối tượng updateFields
-            } else {
-                return res.status(400).json({ message: "Image file not found" });
-            }
         }
 
         // Loại bỏ các giá trị undefined/null khỏi updateFields

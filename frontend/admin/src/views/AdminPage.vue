@@ -41,11 +41,11 @@ export default {
         const router = useRouter();
 
         const menuItems = [
-            { title: "Quản lý tài khoản", icon: "fas fa-user-cog fa-3x", route: "/admin/manage-accounts", bgColor: "bg-primary" },
+            { title: "Quản lý tài khoản", icon: "fas fa-user-cog fa-3x", route: "/admin/user-manage", bgColor: "bg-primary" },
             { title: "Quản lý nhân viên", icon: "fas fa-users fa-3x", route: "/admin/staff-manage", bgColor: "bg-success" },
-            { title: "Quản lý sách", icon: "fas fa-book fa-3x", route: "/admin/manage-books", bgColor: "bg-warning" },
-            { title: "Quản lý đơn mượn sách", icon: "fas fa-file-alt fa-3x", route: "/admin/manage-borrow-orders", bgColor: "bg-danger" },
-            { title: "Quản lý nhà xuất bản", icon: "fas fa-building fa-3x", route: "/admin/manage-publishers", bgColor: "bg-info" }
+            { title: "Quản lý sách", icon: "fas fa-book fa-3x", route: "/admin/book-manage", bgColor: "bg-warning" },
+            { title: "Quản lý đơn mượn sách", icon: "fas fa-file-alt fa-3x", route: "/admin/borrow-manage", bgColor: "bg-danger" },
+            { title: "Quản lý nhà xuất bản", icon: "fas fa-building fa-3x", route: "/admin/publisher-manage", bgColor: "bg-info" }
         ];
 
         const navigateTo = (route) => {

@@ -43,13 +43,13 @@ class BorrowService {
     }
 
     // Cập nhật borrow
-    async updateBorrow(id, userData) {
+    async updateBorrow(id, updateData) {
         try {
-            const response = await this.api.put(`/${id}`, userData); // Gửi PUT request với id
+            const response = await this.api.put(`/${id}`, updateData); 
             return {
                 status: "success",
-                message: response.data?.message || "Updated Borrow successfully", // Thông báo thành công
-                data: response.data?.data || null, // Dữ liệu trả về
+                message: response.data || "Updated Borrow successfully", // Thông báo thành công
+                data: response.data || null, // Dữ liệu trả về
             };
         } catch (err) {
             // Nếu có lỗi, trả về thông báo lỗi
@@ -63,11 +63,12 @@ class BorrowService {
     // Lấy tất cả borrows
     async getAllBorrows() {
         try {
-            const response = await this.api.get("/"); // Gửi GET request không có id
+            const response = await this.api.get("/"); 
+            console.log("Dữ liệu Backend", response.data)
             return {
                 status: "success",
-                data: response.data?.data || [],
-                message: response.data?.message || "Fetched all borrows successfully", // Thông báo thành công
+                data: response.data || [],
+                message: response.data || "Fetched all borrows successfully", // Thông báo thành công
             };
         } catch (err) {
             // Nếu có lỗi, trả về thông báo lỗi

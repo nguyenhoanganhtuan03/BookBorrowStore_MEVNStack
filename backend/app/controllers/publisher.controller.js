@@ -4,10 +4,8 @@ const Publisher = require("../models/publisher.model");
 // Thêm NXB
 exports.addPublisher = async (req, res) => {
     try {
+        console.log("📥 Nhận dữ liệu:", req.body);
         const { publisherName, address } = req.body;
-        if (!publisherName || !address) {
-            return res.status(400).json({ message: "Missing required fields" });
-        }
 
         const db = MongoDB.getDatabase();
 

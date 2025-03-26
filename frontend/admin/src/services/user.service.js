@@ -43,11 +43,11 @@ class UserService {
 
     async getAllUsers() {
         try {
-            const data = (await this.api.get("/")).data;
+            const response = await this.api.get("/")
             return {
                 status: "success",
-                message: data.message || "Users retrieved successfully",
-                data: data.data,
+                message: response.message || "Users retrieved successfully",
+                data: response.data,
             };
         } catch (err) {
             return {
