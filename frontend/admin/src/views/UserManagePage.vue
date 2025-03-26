@@ -41,14 +41,18 @@
                 <input type="text" v-model="newUser.username" placeholder="Tên đăng nhập" class="form-control mb-2" required />
                 <input type="password" v-model="newUser.password" placeholder="Mật khẩu" class="form-control mb-2" required />
                 <input type="text" v-model="newUser.fullname" placeholder="Họ và Tên" class="form-control mb-2" required />
-                <select v-model="newUser.role" class="form-control mb-2">
-                    <option value="">Chọn vai trò</option>
-                    <option value="Quản trị viên">Quản trị viên</option>
-                    <option value="Người dùng">Người dùng</option>
+                <input type="text" v-model="newUser.phone" placeholder="Số điện thoại" class="form-control mb-2" required />
+                <input type="email" v-model="newUser.email" placeholder="Email" class="form-control mb-2" required />
+                <input type="text" v-model="newUser.address" placeholder="Địa chỉ" class="form-control mb-2" required />
+
+                <select v-model="newUser.gender" class="form-control mb-2">
+                    <option value="">Chọn giới tính</option>
+                    <option value="Nam">Nam</option>
+                    <option value="Nữ">Nữ</option>
                     <option value="Khác">Khác</option>
                 </select>
-                <input type="text" v-model="newUser.phone" placeholder="Số điện thoại" class="form-control mb-2" required />
-                <input type="text" v-model="newUser.address" placeholder="Địa chỉ" class="form-control mb-2" required />
+
+                <input type="date" v-model="newUser.dob" class="form-control mb-2" required />
 
                 <div class="d-flex justify-content-end mt-3">
                     <button class="btn btn-secondary me-2" @click="cancelAndCloseModal">Hủy</button>
@@ -82,9 +86,11 @@ export default {
             username: "",
             password: "",
             fullname: "",
-            role: "",
             phone: "",
+            email: "",
             address: "",
+            gender: "",
+            dob: "",
         });
 
         const goBack = () => {
@@ -103,15 +109,16 @@ export default {
         const addUser = async () => {
             try {
                 if (!newUser.value.username || !newUser.value.password || !newUser.value.fullname || 
-                    !newUser.value.role || !newUser.value.phone) {
+                    !newUser.value.phone || !newUser.value.email || !newUser.value.address || 
+                    !newUser.value.gender || !newUser.value.dob) {
                     alert("❌ Vui lòng điền đầy đủ thông tin!");
                     return;
                 }
 
-                await adminService.addUser(newUser.value);
+                await UserService.register(newUser.value);
 
                 // Reset form
-                newUser.value = { username: "", password: "", fullname: "", role: "", phone: "", address: "" };
+                newUser.value = { username: "", password: "", fullname: "", phone: "", email: "", address: "", gender: "", dob: "" };
 
                 // Tải lại danh sách người dùng từ server
                 await fetchUserList();
@@ -140,6 +147,7 @@ export default {
     },
 };
 </script>
+
 
 <style scoped>
 .list-group {
