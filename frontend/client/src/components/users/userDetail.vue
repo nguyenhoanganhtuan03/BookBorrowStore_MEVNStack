@@ -41,9 +41,9 @@
           <div class="mb-3">
             <label class="form-label">Giới tính</label>
             <select id="gender" class="form-select" v-model="user.gender">
-              <option value="male">Nam</option>
-              <option value="female">Nữ</option>
-              <option value="other">Khác</option>
+              <option value="Nam">Nam</option>
+              <option value="Nữ">Nữ</option>
+              <option value="Khác">Khác</option>
             </select>
           </div>
 
