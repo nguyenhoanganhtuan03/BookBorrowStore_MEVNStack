@@ -8,36 +8,49 @@ const userRole = process.env.USER_ROLE
 exports.addStaff = async (req, res) => {
     try {
         const { username, password, fullname, position, phone, address } = req.body;
+
         if (!username || !password || !position) {
             return res.status(400).json({ message: "Missing required fields" });
         }
 
         const db = MongoDB.getDatabase();
 
-        // Kiểm tra xem username đã tồn tại chưa
+        // Kiểm tra username đã tồn tại chưa
         const existingStaff = await db.collection("staffs").findOne({ username: username });
         if (existingStaff) {
             return res.status(400).json({ message: "Username already exists" });
         }
 
-        // Lấy ID nhân viên tiếp theo
-        const lastStaff = await db.collection("staffs").find().sort({ _id: -1 }).limit(1).toArray();
-        let nextId = 0;
-        if (lastStaff.length > 0) {
-            nextId = parseInt(lastStaff[0]._id.split("_")[1]) + 1;
-        }
-        const StaffId = `staff_${nextId}`;
+        // Lấy tất cả _id, lọc và tìm số lớn nhất
+        const allStaffs = await db.collection("staffs").find({}, { projection: { _id: 1 } }).toArray();
+        let maxId = 0;
+
+        allStaffs.forEach(staff => {
+            const match = staff._id.match(/^staff_(\d+)$/); // Tìm số trong _id
+            if (match) {
+                const idNum = parseInt(match[1], 10);
+                if (idNum > maxId) {
+                    maxId = idNum;
+                }
+            }
+        });
+
+        const staffId = `staff_${maxId + 1}`; // Tạo ID tiếp theo
 
         // Tạo nhân viên mới
         const newStaff = new Staff(username, password, fullname, phone, address, position);
-        await db.collection("staffs").insertOne({ _id: StaffId, ...newStaff });
+        
+        console.log("👤 Thêm nhân viên mới:", JSON.stringify({ _id: staffId, ...newStaff }, null, 2));
 
-        res.status(201).json({ message: "Staff added successfully", staff: newStaff });
+        // Lưu vào DB
+        await db.collection("staffs").insertOne({ _id: staffId, ...newStaff });
+
+        res.status(201).json({ message: "Staff added successfully", staffId });
     } catch (error) {
+        console.error("🚨 Lỗi khi thêm nhân viên:", error);
         res.status(500).json({ message: "Failed to add staff", error: error.message });
     }
 };
-
 
 // Xóa NV
 exports.deleteStaff = async (req, res) => {

@@ -9,25 +9,32 @@ exports.addPublisher = async (req, res) => {
 
         const db = MongoDB.getDatabase();
 
-        // Tạo ID mới
-        const lastPublisher = await db.collection("publishers")
-            .find({})
-            .sort({ _id: -1 })
-            .limit(1)
-            .toArray();
+        // Lấy tất cả publisher _id, tìm số lớn nhất
+        const allPublishers = await db.collection("publishers").find({}, { projection: { _id: 1 } }).toArray();
+        let maxId = 0;
 
-        let nextId = 0;
-        if (lastPublisher.length > 0) {
-            nextId = parseInt(lastPublisher[0]._id.split("_")[1]) + 1;
-        }
-        const PublisherId = `pub_${nextId}`;
+        allPublishers.forEach(publisher => {
+            const match = publisher._id.match(/^pub_(\d+)$/); // Tìm số trong _id
+            if (match) {
+                const idNum = parseInt(match[1], 10);
+                if (idNum > maxId) {
+                    maxId = idNum;
+                }
+            }
+        });
+
+        const publisherId = `pub_${maxId + 1}`; // Tạo ID tiếp theo
 
         const newPublisher = new Publisher(publisherName, address);
-        await db.collection("publishers").insertOne({_id: PublisherId, ...newPublisher});
 
-        res.status(201).json({ message: "Publisher added successfully", publisher: newPublisher });
+        console.log("🏢 Thêm nhà xuất bản:", JSON.stringify({ _id: publisherId, ...newPublisher }, null, 2));
+
+        await db.collection("publishers").insertOne({ _id: publisherId, ...newPublisher });
+
+        res.status(201).json({ message: "Publisher added successfully", publisher: { _id: publisherId, ...newPublisher } });
     } catch (error) {
-        res.status(500).json({ message: "Failed to add publisher", error });
+        console.error("🚨 Lỗi khi thêm nhà xuất bản:", error);
+        res.status(500).json({ message: "Failed to add publisher", error: error.message });
     }
 };
 

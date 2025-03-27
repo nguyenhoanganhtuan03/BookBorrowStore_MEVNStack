@@ -22,27 +22,33 @@ exports.register = async (req, res) => {
             return res.status(400).json({ message: "Username already exists" });
         }
 
-        // Tạo UserId mới
-        let nextId = 0;
-        const lastUser = await db.collection("users")
-            .find({})
-            .sort({ _id: -1 })
-            .limit(1)
-            .toArray();
-        
-        if (lastUser.length > 0) {
-            nextId = parseInt(lastUser[0]._id.split("_")[1]) + 1;
-        }
-        const userId = `user_${nextId}`;
+        // Lấy tất cả user _id, tìm số lớn nhất
+        const allUsers = await db.collection("users").find({}, { projection: { _id: 1 } }).toArray();
+        let maxId = 0;
+
+        allUsers.forEach(user => {
+            const match = user._id.match(/^user_(\d+)$/); // Tìm số trong _id
+            if (match) {
+                const idNum = parseInt(match[1], 10);
+                if (idNum > maxId) {
+                    maxId = idNum;
+                }
+            }
+        });
+
+        const userId = `user_${maxId + 1}`; // Tạo ID tiếp theo
 
         // Tạo người dùng mới
         const newUser = new User(username, password, fullname, phone, email, address, gender, dob);
+
+        console.log("👤 Thêm người dùng:", JSON.stringify({ _id: userId, ...newUser }, null, 2));
+
         await db.collection("users").insertOne({ _id: userId, ...newUser });
 
-        res.status(201).json({ message: "User registered successfully" });
+        res.status(201).json({ message: "User registered successfully", user: { _id: userId, username } });
     } catch (error) {
         console.error("🚨 Lỗi khi đăng ký:", error);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({ message: "Internal server error", error: error.message });
     }
 };
 

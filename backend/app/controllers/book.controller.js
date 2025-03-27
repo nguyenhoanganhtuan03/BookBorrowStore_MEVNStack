@@ -6,35 +6,43 @@ const path = require('path');
 // Thêm sách mới
 exports.addBook = async (req, res) => {
     try {
-        const { bookname, author, price, quantity, year, publisherId, category, image } = req.body;
+        console.log("📥 Dữ liệu nhận được:");
+        console.log(JSON.stringify(req.body, null, 2));
+
+        const { bookname, author, price, quantity, publishYear, publisherCode, category, image } = req.body;
         if (!bookname || !author || !price || !quantity) {
             return res.status(400).json({ message: "Missing required fields" });
         }
 
         const db = MongoDB.getDatabase();
 
-        // Lấy ID sách lớn nhất hiện có
-        const lastBook = await db.collection("books")
-            .find({})
-            .sort({ _id: -1 })
-            .limit(1)
-            .toArray();
+        // Lấy tất cả _id, lọc và tìm số lớn nhất
+        const allBooks = await db.collection("books").find({}, { projection: { _id: 1 } }).toArray();
+        let maxId = 0;
 
-        let nextId = 0;
-        if (lastBook.length > 0) {
-            nextId = parseInt(lastBook[0]._id.split("_")[1]) + 1;
-        }
-        const bookId = `book_${nextId}`;
+        allBooks.forEach(book => {
+            const match = book._id.match(/^book_(\d+)$/); // Tìm số trong _id
+            if (match) {
+                const idNum = parseInt(match[1], 10);
+                if (idNum > maxId) {
+                    maxId = idNum;
+                }
+            }
+        });
+
+        const bookId = `book_${maxId + 1}`; // Tạo ID tiếp theo
 
         // Tạo sách mới
-        const newBook = new Book(bookname, author, price, quantity, year, publisherId, category, image);
+        const newBook = new Book(bookname, author, price, quantity, publishYear, publisherCode, category, image);
 
-        // Lưu sách vào cơ sở dữ liệu
+        console.log("📚 Thêm sách mới:", JSON.stringify({ _id: bookId, ...newBook }, null, 2));
+
+        // Lưu sách vào DB
         await db.collection("books").insertOne({ _id: bookId, ...newBook });
 
         res.status(201).json({ message: "Book added successfully", bookId });
     } catch (error) {
-        console.error("🚨 Error adding book:", error);
+        console.error("🚨 Lỗi khi thêm sách:", error);
         res.status(500).json({ message: "Failed to add book", error: error.message });
     }
 };

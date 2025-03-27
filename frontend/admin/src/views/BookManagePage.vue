@@ -42,7 +42,7 @@
                 <input type="text" v-model="newBook.author" placeholder="Tác giả" class="form-control mb-2" required />
                 <input type="number" v-model="newBook.price" placeholder="Giá" class="form-control mb-2" required />
                 <input type="number" v-model="newBook.quantity" placeholder="Số lượng" class="form-control mb-2" required />
-                <input type="text" v-model="newBook.publishYear" placeholder="Năm xuất bản" class="form-control mb-2" />
+                <input type="number" v-model="newBook.publishYear" placeholder="Năm xuất bản" class="form-control mb-2" />
                 <input type="text" v-model="newBook.publisherCode" placeholder="Mã nhà xuất bản" class="form-control mb-2" />
                 <input type="text" v-model="newBook.category" placeholder="Thể loại" class="form-control mb-2" />
                 
@@ -86,7 +86,7 @@ export default {
             price: null,
             quantity: null,
             publishYear: null,
-            publisherCode: null,
+            publisherCode: "",
             category: null,
             image: null,
         });
@@ -113,7 +113,11 @@ export default {
                     return;
                 }
 
-                // Nếu có ảnh, chuyển sang base64 trước khi lưu
+                // Chuyển đổi publishYear và publisherCode về đúng kiểu dữ liệu
+                newBook.value.publishYear = newBook.value.publishYear ? Number(newBook.value.publishYear) : null;
+                newBook.value.publisherCode = newBook.value.publisherCode ? String(newBook.value.publisherCode) : null;
+
+                // Nếu có ảnh, chuyển sang base64
                 if (newBook.value.image) {
                     const convertToBase64 = (file) => {
                         return new Promise((resolve, reject) => {
@@ -152,6 +156,7 @@ export default {
                 alert("❌ Không thể thêm sách!");
             }
         };
+
         const handleImageUpload = (event) => {
             const file = event.target.files[0];
             if (file) {

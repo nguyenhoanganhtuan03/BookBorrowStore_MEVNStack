@@ -23,17 +23,21 @@ exports.createBorrow = async (req, res) => {
             return res.status(404).json({ message: "Book not found" });
         }
 
-        // Lấy borrowId tiếp theo
-        const lastBorrow = await db.collection("borrows")
-            .find({})
-            .sort({ _id: -1 })
-            .limit(1)
-            .toArray();
-        let nextId = 0;
-        if (lastBorrow.length > 0) {
-            nextId = parseInt(lastBorrow[0]._id.split("_")[1]) + 1;
-        }
-        const borrowId = `borrow_${nextId}`;
+        // Lấy tất cả borrow _id, tìm số lớn nhất
+        const allBorrows = await db.collection("borrows").find({}, { projection: { _id: 1 } }).toArray();
+        let maxId = 0;
+
+        allBorrows.forEach(borrow => {
+            const match = borrow._id.match(/^borrow_(\d+)$/); // Tìm số trong _id
+            if (match) {
+                const idNum = parseInt(match[1], 10);
+                if (idNum > maxId) {
+                    maxId = idNum;
+                }
+            }
+        });
+
+        const borrowId = `borrow_${maxId + 1}`; // Tạo ID tiếp theo
 
         // Lấy username và bookname
         const username = user.username;
@@ -41,17 +45,21 @@ exports.createBorrow = async (req, res) => {
 
         // Tạo đơn mượn mới
         const newBorrow = new Borrow(userId, username, bookId, bookname, borrowDate, returnDate, note);
+
+        console.log("📚 Thêm đơn mượn:", JSON.stringify({ _id: borrowId, ...newBorrow }, null, 2));
+
+        // Lưu vào DB
         await db.collection("borrows").insertOne({ _id: borrowId, ...newBorrow });
 
         // Trừ quantity của sách đi 1
         await db.collection("books").updateOne(
             { _id: bookId },
-            { $set: { quantity: (parseInt(book.quantity) - 1) } }
+            { $set: { quantity: Math.max(0, parseInt(book.quantity) - 1) } } // Đảm bảo không âm
         );
 
         res.status(201).json({ message: "Borrow record created successfully", borrow: { _id: borrowId, ...newBorrow } });
     } catch (error) {
-        console.log(error)
+        console.log("🚨 Lỗi khi tạo đơn mượn:", error);
         res.status(500).json({ message: "Failed to create borrow record", error: error.message });
     }
 };
